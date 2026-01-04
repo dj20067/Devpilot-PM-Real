@@ -132,14 +132,31 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
     >
       
       {/* Top Drag Handle Bar */}
-      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-50 dark:border-slate-800 bg-white dark:bg-surface-dark select-none shrink-0 relative z-20">
-          <div class="flex-1 flex justify-center items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium translate-x-3">
-             <span class="material-icons-outlined text-green-500 text-lg rotate-12">wifi_calling_3</span>
-             <span class="text-sm">在线</span>
-          </div>
+      <div class="flex justify-between items-center px-4 py-3 border-b border-slate-50 dark:border-slate-800 bg-white dark:bg-surface-dark select-none shrink-0 relative z-20 h-[56px]">
+          {/* Header Content: Shows Context Capsule if active, otherwise shows Default Title */}
+          {viewState === 'dialpad' && activeContext ? (
+             <div class="flex-1 flex justify-center items-center animate-in fade-in slide-in-from-top-2 duration-300">
+                <div class="bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-300 px-3 py-1.5 rounded-full text-xs flex items-center gap-2 max-w-[220px] shadow-sm">
+                    <span class="material-icons-outlined text-sm">link</span>
+                    <span class="truncate font-medium">关联中: {activeContext.userName} - {activeContext.recordTitle}</span>
+                    <button 
+                        onClick={clearContext}
+                        class="ml-1 w-4 h-4 rounded-full flex items-center justify-center hover:bg-blue-100 dark:hover:bg-blue-800 text-blue-400 hover:text-blue-600 transition-colors shrink-0"
+                    >
+                        <span class="material-icons-outlined text-[10px]">close</span>
+                    </button>
+                </div>
+             </div>
+          ) : (
+            <div class="flex-1 flex justify-center items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium translate-x-3">
+               <span class="material-icons-outlined text-green-500 text-lg rotate-12">wifi_calling_3</span>
+               <span class="text-sm">在线</span>
+            </div>
+          )}
+
           <div 
             onMouseDown={handleMouseDown}
-            class="cursor-move text-slate-300 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-300 p-1 border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors"
+            class="cursor-move text-slate-300 hover:text-slate-500 dark:text-slate-500 dark:hover:text-slate-300 p-1 border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-800 active:bg-slate-100 dark:active:bg-slate-700 transition-colors ml-2"
           >
              <span class="material-icons-outlined text-lg block">open_with</span> 
           </div>
@@ -148,22 +165,6 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
       {/* Main Content Area based on ViewState */}
       <div class="relative bg-white dark:bg-surface-dark flex-1 flex flex-col">
         
-        {/* Context Capsule (Floating) - Only show in Dialpad view */}
-        {viewState === 'dialpad' && activeContext && (
-            <div class="absolute top-2 left-0 w-full flex justify-center z-10 animate-in slide-in-from-top-2 fade-in duration-300">
-                <div class="bg-blue-50/90 dark:bg-blue-900/40 backdrop-blur-sm border border-blue-100 dark:border-blue-800 text-blue-700 dark:text-blue-300 pl-3 pr-2 py-1.5 rounded-full text-xs flex items-center gap-2 shadow-sm max-w-[90%]">
-                    <span class="material-icons-outlined text-sm">link</span>
-                    <span class="truncate max-w-[160px]">关联中: {activeContext.userName} - {activeContext.recordTitle}</span>
-                    <button 
-                        onClick={clearContext}
-                        class="ml-1 w-4 h-4 rounded-full bg-blue-100 dark:bg-blue-800 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-700 transition-colors"
-                    >
-                        <span class="material-icons-outlined text-[10px]">close</span>
-                    </button>
-                </div>
-            </div>
-        )}
-
         {/* VIEW 1: Dialpad */}
         {viewState === 'dialpad' && (
             <>
