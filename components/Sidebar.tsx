@@ -20,40 +20,40 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <nav class="w-56 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col shrink-0 overflow-y-auto">
-      <div class="py-2">
+    <nav className="w-56 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col shrink-0 overflow-y-auto">
+      <div className="py-2">
         {menuItems.map((item, index) => (
           <a 
             key={index}
             href="#"
-            class={`flex items-center gap-3 px-4 py-3 transition-colors ${
+            className={`flex items-center gap-3 px-4 py-3 transition-colors ${
               item.active 
                 ? 'bg-red-50 dark:bg-red-900/20 text-red-500 border-r-2 border-red-500' 
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
             }`}
           >
-            <span class="material-icons-outlined text-lg">{item.icon}</span>
-            <span class={item.active ? 'font-medium' : ''}>{item.label}</span>
+            <span className="material-icons-outlined text-lg">{item.icon}</span>
+            <span className={item.active ? 'font-medium' : ''}>{item.label}</span>
           </a>
         ))}
 
-        <div class="mt-2">
+        <div className="mt-2">
           {bottomItems.map((item, index) => (
             <div 
               key={index}
-              class="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
+              className="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
             >
-              <div class="flex items-center gap-3">
-                <span class="material-icons-outlined text-lg">{item.icon}</span>
+              <div className="flex items-center gap-3">
+                <span className="material-icons-outlined text-lg">{item.icon}</span>
                 <span>{item.label}</span>
               </div>
-              {!item.noArrow && <span class="material-icons-outlined text-sm">expand_more</span>}
+              {!item.noArrow && <span className="material-icons-outlined text-sm">expand_more</span>}
             </div>
           ))}
         </div>
       </div>
-      <div class="mt-auto px-4 py-3 border-t border-border-light dark:border-border-dark">
-        <span class="material-icons-outlined text-lg text-slate-400">notes</span>
+      <div className="mt-auto px-4 py-3 border-t border-border-light dark:border-border-dark">
+        <span className="material-icons-outlined text-lg text-slate-400">notes</span>
       </div>
     </nav>
   );

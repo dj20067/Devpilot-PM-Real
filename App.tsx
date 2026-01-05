@@ -95,12 +95,20 @@ const App: React.FC = () => {
     const activeSession = sessions.find(s => s.id === activeSessionId);
     
     if (activeSession) {
+      const now = new Date();
+      const yy = String(now.getFullYear()).slice(-2);
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const timeStr = `${yy}/${mm}/${dd} ${hh}:${min}`;
+
       setOutboundContext({
         userId: activeSession.user.id,
         userName: activeSession.user.name,
         recordType: 'session',
         recordId: activeSession.id,
-        recordTitle: '当前会话'
+        recordTitle: `会话：${timeStr}`
       });
     } else {
       setOutboundContext(null);
@@ -110,10 +118,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div class="flex flex-col h-full bg-background-light dark:bg-background-dark">
+    <div className="flex flex-col h-full bg-background-light dark:bg-background-dark">
       <Header onOpenOutbound={handleOpenOutbound} />
       
-      <div class="flex flex-1 overflow-hidden relative">
+      <div className="flex flex-1 overflow-hidden relative">
         <Sidebar />
         <ChatList 
           sessions={sessions} 
@@ -126,8 +134,8 @@ const App: React.FC = () => {
         />
         
         {/* Expand button mock - right side of chat window */}
-        <div class="w-4 flex items-center justify-center bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0">
-          <span class="material-icons-outlined text-xs text-slate-400">chevron_right</span>
+        <div className="w-4 flex items-center justify-center bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0">
+          <span className="material-icons-outlined text-xs text-slate-400">chevron_right</span>
         </div>
 
         <RightPanel 
