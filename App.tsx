@@ -5,6 +5,7 @@ import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
 import RightPanel from './components/RightPanel';
 import OutboundConsole from './components/OutboundConsole';
+import ServiceConfirmationModal from './components/ServiceConfirmationModal';
 import { User, ChatSession, Message, RightPanelTab, OutboundContext, UserRole } from './types';
 
 // Mock Data
@@ -20,7 +21,33 @@ const currentUser: User = {
   tenantType: '未签约组织',
 };
 
-const sessions: ChatSession[] = [
+// Queued Users Mock
+const queuedUsers: User[] = [
+    {
+        id: 'u2',
+        name: '苦瓜',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix',
+        company: '杭州某电商',
+        email: 'kg@ds.com',
+        phone: '13812345678',
+        type: '个人账号',
+        tier: '1星',
+        tenantType: '个人'
+    },
+    {
+        id: 'u3',
+        name: '西瓜',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka',
+        company: '上海科技',
+        email: 'xg@sh.com',
+        phone: '13987654321',
+        type: '企业账号',
+        tier: 'VIP',
+        tenantType: 'VIP组织'
+    }
+];
+
+const initialSessions: ChatSession[] = [
   {
     id: 's1',
     user: currentUser,
@@ -28,10 +55,26 @@ const sessions: ChatSession[] = [
     lastMessageTime: '10:35',
     status: 'active',
     hasCertificate: true,
+  },
+  {
+      id: 'q1',
+      user: queuedUsers[0],
+      lastMessage: '请问如何使用Excel批量抓取数据？',
+      lastMessageTime: '10:45',
+      status: 'queued',
+      hasCertificate: false
+  },
+  {
+      id: 'q2',
+      user: queuedUsers[1],
+      lastMessage: '流程运行报错：找不到目标元素...',
+      lastMessageTime: '10:48',
+      status: 'queued',
+      hasCertificate: true
   }
 ];
 
-const messages: Message[] = [
+const initialMessages: Message[] = [
   {
     id: 'm1',
     senderId: 'system',
@@ -84,19 +127,23 @@ const messages: Message[] = [
 ];
 
 const App: React.FC = () => {
+  const [sessions, setSessions] = useState<ChatSession[]>(initialSessions);
   const [activeSessionId, setActiveSessionId] = useState<string>('s1');
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [activeRightTab, setActiveRightTab] = useState<RightPanelTab>(RightPanelTab.CUSTOMER_INFO);
   const [isOutboundOpen, setIsOutboundOpen] = useState<boolean>(false);
   const [outboundContext, setOutboundContext] = useState<OutboundContext | null>(null);
   
-  // Role State
+  // Role & Service Modal State
   const [userRole, setUserRole] = useState<UserRole>('official');
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
+
+  // Derived current session and user
+  const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
+  const displayUser = activeSession.user;
 
   const handleOpenOutbound = () => {
-    // Determine context based on the current view. 
-    // Currently, we are viewing 's1', so we mock the context of that session.
-    const activeSession = sessions.find(s => s.id === activeSessionId);
-    
     if (activeSession) {
       const now = new Date();
       const yy = String(now.getFullYear()).slice(-2);
@@ -120,6 +167,94 @@ const App: React.FC = () => {
     setIsOutboundOpen(true);
   };
 
+  const handleSelectSession = (sessionId: string) => {
+    setActiveSessionId(sessionId);
+  };
+
+  // Helper to move session to top and update status/time
+  const promoteSessionToTop = (sessionId: string, newStatus: 'active' | 'queued' | 'ended', lastMessageContent?: string) => {
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      setSessions(prev => {
+          const targetIndex = prev.findIndex(s => s.id === sessionId);
+          if (targetIndex === -1) return prev;
+          
+          const targetSession = { ...prev[targetIndex] };
+          targetSession.status = newStatus;
+          targetSession.lastMessageTime = timeStr;
+          if (lastMessageContent) {
+              targetSession.lastMessage = lastMessageContent;
+          }
+
+          const otherSessions = prev.filter(s => s.id !== sessionId);
+          // Return new array with target at the beginning (top)
+          return [targetSession, ...otherSessions];
+      });
+  };
+
+  const handleConnectTrigger = () => {
+    if (userRole === 'developer') {
+        // If developer, require confirmation
+        setPendingSessionId(activeSessionId);
+        setIsServiceModalOpen(true);
+    } else {
+        // If official, connect immediately and move to top
+        promoteSessionToTop(activeSessionId, 'active');
+    }
+  };
+
+  const handleConfirmService = () => {
+      if (pendingSessionId) {
+          const now = new Date();
+          const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+          
+          // Update session to active and move to top of list
+          promoteSessionToTop(pendingSessionId, 'active', '[系统通知] 已作为热心开发者接入');
+          
+          // Push developer-specific guidance messages
+          const guidanceMessages: Message[] = [
+            {
+              id: `sys_guide_${Date.now()}_1`,
+              senderId: 'system',
+              senderName: '系统助手',
+              type: 'notice',
+              timestamp: timeStr,
+              content: `
+                <div class="flex items-center gap-2 mb-1">
+                   <span class="material-icons-outlined text-blue-500 text-sm">how_to_reg</span>
+                   <span class="font-bold text-slate-700 dark:text-slate-200">已作为「热心开发者」接入会话</span>
+                </div>
+                <div class="text-slate-500 dark:text-slate-400 pl-6">
+                   当前身份仅支持提供建议，无法直接操作用户账号。服务过程中请注意保护用户隐私。
+                </div>
+              `
+            },
+            {
+               id: `sys_guide_${Date.now()}_2`,
+               senderId: 'system',
+               senderName: '系统助手',
+               type: 'notice',
+               timestamp: timeStr,
+               content: `
+                <div class="flex items-center gap-2 mb-1">
+                   <span class="material-icons-outlined text-orange-500 text-sm">tips_and_updates</span>
+                   <span class="font-bold text-slate-700 dark:text-slate-200">服务小贴士</span>
+                </div>
+                <ul class="list-disc list-inside text-slate-500 dark:text-slate-400 pl-1 space-y-1">
+                   <li>提供的代码片段请务必提示用户先在测试环境运行</li>
+                   <li>如遇技术难题，可建议用户提交工单转交官方</li>
+                </ul>
+               ` 
+            }
+          ];
+          setMessages(prev => [...prev, ...guidanceMessages]);
+          
+          setPendingSessionId(null);
+          setIsServiceModalOpen(false);
+      }
+  };
+
   return (
     <div className="flex flex-col h-full bg-background-light dark:bg-background-dark">
       <Header 
@@ -133,11 +268,14 @@ const App: React.FC = () => {
         <ChatList 
           sessions={sessions} 
           activeSessionId={activeSessionId} 
-          onSelectSession={setActiveSessionId} 
+          onSelectSession={handleSelectSession} 
         />
         <ChatWindow 
-          user={currentUser} 
-          messages={messages} 
+          user={displayUser} 
+          messages={messages}
+          userRole={userRole}
+          sessionStatus={activeSession.status}
+          onConnect={handleConnectTrigger}
         />
         
         {/* Expand button mock - right side of chat window */}
@@ -146,7 +284,7 @@ const App: React.FC = () => {
         </div>
 
         <RightPanel 
-          user={currentUser} 
+          user={displayUser} 
           activeTab={activeRightTab} 
           onTabChange={setActiveRightTab} 
         />
@@ -156,6 +294,12 @@ const App: React.FC = () => {
           isOpen={isOutboundOpen} 
           onClose={() => setIsOutboundOpen(false)} 
           initialContext={outboundContext}
+        />
+
+        <ServiceConfirmationModal 
+            isOpen={isServiceModalOpen}
+            onClose={() => setIsServiceModalOpen(false)}
+            onConfirm={handleConfirmService}
         />
       </div>
     </div>

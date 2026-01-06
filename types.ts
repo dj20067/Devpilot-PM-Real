@@ -22,6 +22,7 @@ export interface Message {
   isSystem?: boolean;
   type: 'text' | 'notice' | 'system_end';
   readStatus?: 'read' | 'unread';
+  status?: 'sending' | 'sent' | 'failed';
 }
 
 export interface ChatSession {
