@@ -394,7 +394,7 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                                         onClick={() => handleSelectItem({
                                                             id: 't1',
                                                             type: 'ticket',
-                                                            title: '工单 #T-20260101',
+                                                            title: '椰子-工单 #T-20260101',
                                                             subtitle: '无法安装Studio，报错代码503'
                                                         })}
                                                         className="flex items-center gap-3 px-2 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded cursor-pointer group"
@@ -404,7 +404,7 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                                         </div>
                                                         <div className="min-w-0 flex-1">
                                                             <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
-                                                                工单 #T-20260101
+                                                                椰子-工单 #T-20260101
                                                             </div>
                                                             <div className="text-xs text-slate-400 truncate">无法安装Studio，报错代码503</div>
                                                         </div>
@@ -488,12 +488,12 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                             onClick={() => handleSelectItem({
                                                 id: 't1',
                                                 type: 'ticket',
-                                                title: '工单 #T-20260101',
+                                                title: '椰子-工单 #T-20260101',
                                                 subtitle: '无法安装Studio，报错代码503'
                                             })}
                                             className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors"
                                         >
-                                            工单 #T-20260101
+                                            椰子-工单 #T-20260101
                                         </button>
                                     )}
                                 </div>
