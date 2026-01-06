@@ -210,7 +210,7 @@ const App: React.FC = () => {
           const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
           
           // Update session to active and move to top of list
-          promoteSessionToTop(pendingSessionId, 'active', '[系统通知] 已作为热心开发者接入');
+          promoteSessionToTop(pendingSessionId, 'active', '[系统通知] 已作为社区飞行员接入');
           
           // Push developer-specific guidance messages
           const guidanceMessages: Message[] = [
@@ -222,8 +222,8 @@ const App: React.FC = () => {
               timestamp: timeStr,
               content: `
                 <div class="flex items-center gap-2 mb-1">
-                   <span class="material-icons-outlined text-blue-500 text-sm">how_to_reg</span>
-                   <span class="font-bold text-slate-700 dark:text-slate-200">已作为「热心开发者」接入会话</span>
+                   <span class="material-icons-outlined text-blue-500 text-sm">flight_takeoff</span>
+                   <span class="font-bold text-slate-700 dark:text-slate-200">已作为「社区飞行员」接入会话</span>
                 </div>
                 <div class="text-slate-500 dark:text-slate-400 pl-6">
                    当前身份仅支持提供建议，无法直接操作用户账号。服务过程中请注意保护用户隐私。

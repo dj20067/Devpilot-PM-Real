@@ -55,28 +55,29 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                 <span className="text-xs">子鱼</span>
                 <div className="flex items-center gap-1 mt-0.5">
                   <span className="text-[9px] opacity-70 scale-90 origin-left border border-gray-500 px-1 rounded">
-                      {userRole === 'official' ? '官方工程师' : '热心开发者'}
+                      {userRole === 'official' ? '官方工程师' : '社区飞行员'}
                   </span>
                   
                   {userRole === 'developer' && (
                     <div className="relative group" onClick={(e) => e.stopPropagation()}>
-                        <div className="scale-90 origin-left text-[9px] bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-400 border border-amber-500/40 px-1.5 rounded cursor-help flex items-center gap-0.5 hover:bg-amber-500/30 transition-colors">
-                            <span className="material-icons-outlined text-[8px]">military_tech</span>
-                            <span>Lv.3</span>
+                        <div className="scale-90 origin-left text-[9px] bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-1.5 rounded cursor-help flex items-center gap-0.5 hover:bg-amber-500/30 transition-colors">
+                            <span className="material-icons-outlined text-[10px]">military_tech</span>
+                            <span className="font-bold">金牌</span>
                         </div>
 
                         {/* Tooltip */}
                         <div className="absolute top-full right-0 pt-3 w-64 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-[60] cursor-default">
                               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                                 {/* Header */}
-                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-3 border-b border-amber-100 dark:border-amber-900/30 flex justify-between items-center">
-                                    <div>
+                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-3 border-b border-amber-100 dark:border-amber-900/30 flex justify-between items-center relative overflow-hidden">
+                                    <div className="z-10 relative">
                                         <div className="text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1">
-                                            <span>Lv.3 高级开发者</span>
+                                            <span className="material-icons-outlined text-sm">flight_takeoff</span>
+                                            <span>金牌飞行员</span>
                                         </div>
                                         <div className="text-[10px] text-amber-500/80 mt-0.5">当前收益系数: <span className="font-bold">1.5x</span></div>
                                     </div>
-                                    <span className="material-icons-outlined text-amber-400 text-2xl opacity-50">military_tech</span>
+                                    <span className="material-icons-outlined text-amber-400 text-5xl opacity-10 absolute -right-2 -bottom-4 rotate-12">military_tech</span>
                                 </div>
                                 
                                 {/* Content */}
@@ -113,7 +114,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                                             说明
                                         </div>
                                         <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                                            当前等级由运营团队根据以上维度综合评估。保持活跃与高质量服务有助于快速晋升。
+                                            等级体系：见习 / 铜牌 / 银牌 / 金牌 / 铂金。<br/>当前等级由运营团队综合评估。
                                         </p>
                                     </div>
                                 </div>
@@ -143,7 +144,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                         onClick={() => { onRoleChange('developer'); setIsMenuOpen(false); }}
                         className={`w-full text-left px-4 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between ${userRole === 'developer' ? 'text-blue-600 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/10' : 'text-slate-600 dark:text-slate-300'}`}
                     >
-                        <span>热心开发者</span>
+                        <span>社区飞行员</span>
                         {userRole === 'developer' && <span className="material-icons-outlined text-sm">check</span>}
                     </button>
                     <div className="border-t border-slate-100 dark:border-slate-700 mt-1"></div>

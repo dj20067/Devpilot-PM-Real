@@ -21,11 +21,11 @@ const ServiceConfirmationModal: React.FC<ServiceConfirmationModalProps> = ({ isO
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
           <div className="flex items-center gap-3 text-white">
             <div className="p-2 bg-white/20 rounded-full">
-               <span className="material-icons-outlined text-xl">volunteer_activism</span>
+               <span className="material-icons-outlined text-xl">flight_takeoff</span>
             </div>
             <div>
               <h3 className="text-lg font-bold">社区服务公约</h3>
-              <p className="text-xs text-blue-100 opacity-90">热心开发者接单确认</p>
+              <p className="text-xs text-blue-100 opacity-90">社区飞行员接单确认</p>
             </div>
           </div>
         </div>
@@ -33,7 +33,7 @@ const ServiceConfirmationModal: React.FC<ServiceConfirmationModalProps> = ({ isO
         {/* Content */}
         <div className="p-6 space-y-4">
           <div className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-3">
-            <p>感谢您作为<span className="font-bold text-blue-600 dark:text-blue-400">「热心开发者」</span>参与社区互助。在接入该用户的咨询前，请确认以下事项：</p>
+            <p>感谢您作为<span className="font-bold text-blue-600 dark:text-blue-400">「社区飞行员」</span>参与社区互助。在接入该用户的咨询前，请确认以下事项：</p>
             
             <ul className="space-y-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
               <li className="flex gap-2 items-start">
