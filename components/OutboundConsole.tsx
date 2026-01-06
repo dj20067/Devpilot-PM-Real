@@ -8,6 +8,16 @@ interface OutboundConsoleProps {
 }
 
 type ViewState = 'dialpad' | 'calling' | 'association';
+type AssociationTab = 'session' | 'ticket';
+
+interface AssociationItem {
+  id: string;
+  type: 'session' | 'ticket';
+  title: string;
+  subtitle: string;
+  avatar?: string;
+  tag?: string;
+}
 
 const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, initialContext }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -18,6 +28,12 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
   const [activeContext, setActiveContext] = useState<OutboundContext | null>(null);
   const [viewState, setViewState] = useState<ViewState>('dialpad');
   const [callDuration, setCallDuration] = useState(0);
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [associationTab, setAssociationTab] = useState<AssociationTab>('session');
+  const [selectedItem, setSelectedItem] = useState<AssociationItem | null>(null);
 
   const dragOffset = useRef({ x: 0, y: 0 });
   const modalRef = useRef<HTMLDivElement>(null);
@@ -41,6 +57,9 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
       setActiveContext(initialContext);
       setViewState('dialpad');
       setPhoneNumber('');
+      setSearchQuery('');
+      setAssociationTab('session');
+      setSelectedItem(null);
     }
   }, [isOpen, initialContext]);
 
@@ -120,6 +139,21 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
 
   const clearContext = () => {
       setActiveContext(null);
+  };
+
+  const handleSearchFocus = () => setIsSearchFocused(true);
+  const handleSearchBlur = () => setTimeout(() => setIsSearchFocused(false), 200);
+
+  const handleSelectItem = (item: AssociationItem) => {
+    setSelectedItem(item);
+    setSearchQuery('');
+    setIsSearchFocused(false);
+  };
+
+  const handleTabChange = (tab: AssociationTab) => {
+      setAssociationTab(tab);
+      setSearchQuery('');
+      setSelectedItem(null);
   };
 
   if (!isOpen) return null;
@@ -279,63 +313,205 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
         {/* VIEW 3: Association (Post Call) */}
         {viewState === 'association' && (
             <div className="flex flex-col h-full min-h-[400px] animate-in slide-in-from-bottom-5 duration-300 p-6">
-                <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-6">
-                        <div className="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center">
-                            <span className="material-icons-outlined">link_off</span>
+                <div className="flex-1 flex flex-col">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center shrink-0">
+                            <span className="material-icons-outlined text-sm">link_off</span>
                         </div>
                         <div>
                             <h3 className="font-medium text-slate-800 dark:text-slate-200">补录关联信息</h3>
-                            <p className="text-xs text-slate-500">本次通话未关联到具体记录</p>
+                            <p className="text-[10px] text-slate-500">通话结束，请关联业务记录</p>
                         </div>
                     </div>
 
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">通话对象</label>
+                    <div className="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-lg mb-4 shrink-0">
+                        <button
+                            onClick={() => handleTabChange('session')}
+                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${associationTab === 'session' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-600'}`}
+                        >
+                            关联会话
+                        </button>
+                        <button
+                            onClick={() => handleTabChange('ticket')}
+                            className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${associationTab === 'ticket' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-600'}`}
+                        >
+                            关联工单
+                        </button>
+                    </div>
+
+                    <div className="space-y-4 flex-1 flex flex-col">
+                        <div className="relative z-20">
+                            <span className={`absolute left-3 top-3 material-icons-outlined text-lg transition-colors ${isSearchFocused ? 'text-blue-500' : 'text-slate-400'}`}>search</span>
                             <input 
                                 type="text" 
-                                value={phoneNumber}
-                                disabled
-                                className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-slate-600"
+                                placeholder={associationTab === 'session' ? "搜索客户姓名、手机号" : "搜索工单号、客户姓名"}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onFocus={handleSearchFocus}
+                                onBlur={handleSearchBlur}
+                                className={`w-full text-sm pl-9 pr-3 py-2.5 bg-white dark:bg-surface-dark border rounded transition-all ${isSearchFocused ? 'border-blue-500 ring-1 ring-blue-500 shadow-sm' : 'border-slate-300 dark:border-slate-600'}`}
                             />
+                            {isSearchFocused && searchQuery && (
+                                <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-600 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 ring-1 ring-slate-200 dark:ring-slate-700 z-50">
+                                    <div className="max-h-60 overflow-y-auto">
+                                        {associationTab === 'session' && (
+                                            <>
+                                                <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 text-[10px] font-bold text-slate-400 uppercase tracking-wider">匹配会话</div>
+                                                <div className="p-1">
+                                                    <div 
+                                                        onClick={() => handleSelectItem({
+                                                            id: 's1',
+                                                            type: 'session',
+                                                            title: '椰子 2026/01/04 10:35 触发的会话',
+                                                            subtitle: '分叉科技 · 135****8641',
+                                                            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo',
+                                                            tag: '企业'
+                                                        })}
+                                                        className="flex items-center gap-3 px-2 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded cursor-pointer group"
+                                                    >
+                                                        <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden shrink-0">
+                                                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo" className="w-full h-full object-cover"/>
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate" title="椰子 2026/01/04 10:35 触发的会话">
+                                                                椰子 2026/01/04 10:35 触发的会话
+                                                            </div>
+                                                            <div className="text-xs text-slate-400 truncate flex items-center gap-1.5">
+                                                                 <span className="text-[10px] bg-slate-100 dark:bg-slate-700 px-1 rounded text-slate-500">企业</span>
+                                                                 <span>分叉科技 · 135****8641</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                        
+                                        {associationTab === 'ticket' && (
+                                            <>
+                                                <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 text-[10px] font-bold text-slate-400 uppercase tracking-wider">相关工单</div>
+                                                <div className="p-1">
+                                                    <div 
+                                                        onClick={() => handleSelectItem({
+                                                            id: 't1',
+                                                            type: 'ticket',
+                                                            title: '工单 #T-20260101',
+                                                            subtitle: '无法安装Studio，报错代码503'
+                                                        })}
+                                                        className="flex items-center gap-3 px-2 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded cursor-pointer group"
+                                                    >
+                                                        <div className="w-8 h-8 rounded bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center shrink-0">
+                                                            <span className="material-icons-outlined text-base">confirmation_number</span>
+                                                        </div>
+                                                        <div className="min-w-0 flex-1">
+                                                            <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
+                                                                工单 #T-20260101
+                                                            </div>
+                                                            <div className="text-xs text-slate-400 truncate">无法安装Studio，报错代码503</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            {/* Empty/Loading State for dropdown */}
+                            {isSearchFocused && !searchQuery && (
+                                <div className="absolute top-full left-0 w-full mt-1 bg-white dark:bg-surface-dark border border-slate-100 dark:border-slate-600 rounded-lg shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 ring-1 ring-slate-200 dark:ring-slate-700 z-50">
+                                    <div className="p-8 flex flex-col items-center justify-center text-slate-400 gap-2">
+                                        <span className="material-icons-outlined text-3xl text-slate-300">search</span>
+                                        <span className="text-xs">
+                                            {associationTab === 'session' ? '输入关键词查找客户' : '输入关键词查找工单'}
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <div>
-                            <label className="block text-xs font-medium text-slate-500 mb-1">关联客户/工单</label>
-                            <div className="relative">
-                                <span className="absolute left-3 top-1/2 -translate-y-1/2 material-icons-outlined text-slate-400 text-lg">search</span>
-                                <input 
-                                    type="text" 
-                                    placeholder="搜索客户姓名、手机号或工单号"
-                                    className="w-full text-sm pl-9 pr-3 py-2 bg-white dark:bg-surface-dark border border-slate-300 dark:border-slate-600 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                />
-                            </div>
-                            <div className="mt-2 text-xs text-slate-400">
-                                最近会话：
-                                <div className="mt-1 flex flex-wrap gap-2">
-                                    <button className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors">
-                                        椰子 - 会话 #s1
-                                    </button>
-                                     <button className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors">
-                                        工单 #T-20260101
+                        {/* Selected Item Display */}
+                        {selectedItem && (
+                            <div className="mt-3 relative group animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div className="absolute -top-2 left-3 bg-white dark:bg-surface-dark px-1 text-[10px] text-blue-500 font-medium z-10">
+                                    已选择
+                                </div>
+                                <div className="p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-3 relative overflow-hidden">
+                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${selectedItem.type === 'session' ? 'bg-slate-200' : 'bg-orange-100 text-orange-500'}`}>
+                                        {selectedItem.type === 'session' ? (
+                                             <img src={selectedItem.avatar} className="w-full h-full object-cover rounded-full"/>
+                                        ) : (
+                                            <span className="material-icons-outlined">confirmation_number</span>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-sm font-medium text-slate-800 dark:text-slate-100 truncate">
+                                            {selectedItem.title}
+                                        </div>
+                                        <div className="text-xs text-slate-500 truncate flex items-center gap-1">
+                                            {selectedItem.tag && <span className="px-1 bg-slate-100 dark:bg-slate-700 rounded text-[10px] text-slate-500">{selectedItem.tag}</span>}
+                                            {selectedItem.subtitle}
+                                        </div>
+                                    </div>
+
+                                    <button 
+                                        onClick={() => setSelectedItem(null)}
+                                        className="w-6 h-6 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-slate-400 hover:text-slate-600 transition-colors"
+                                    >
+                                        <span className="material-icons-outlined text-sm">close</span>
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        )}
+                        
+                        {/* Recent Items (Hidden when searching or item selected) */}
+                        {!isSearchFocused && !selectedItem && (
+                            <div className="mt-2 text-xs text-slate-400">
+                                {associationTab === 'session' ? '最近会话：' : '最近工单：'}
+                                <div className="mt-1 flex flex-wrap gap-2">
+                                    {associationTab === 'session' ? (
+                                        <button 
+                                            onClick={() => handleSelectItem({
+                                                id: 's1',
+                                                type: 'session',
+                                                title: '椰子 2026/01/04 10:35 触发的会话',
+                                                subtitle: '分叉科技 · 135****8641',
+                                                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo',
+                                                tag: '企业'
+                                            })}
+                                            className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors"
+                                        >
+                                            椰子 10:35 会话
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            onClick={() => handleSelectItem({
+                                                id: 't1',
+                                                type: 'ticket',
+                                                title: '工单 #T-20260101',
+                                                subtitle: '无法安装Studio，报错代码503'
+                                            })}
+                                            className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors"
+                                        >
+                                            工单 #T-20260101
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div className="mt-auto flex gap-3">
+                <div className="mt-auto flex gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
                     <button 
-                        onClick={() => { setViewState('dialpad'); setPhoneNumber(''); }}
+                        onClick={() => { setViewState('dialpad'); setPhoneNumber(''); setSelectedItem(null); }}
                         className="flex-1 py-2 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-sm"
                     >
                         暂不关联
                     </button>
                     <button 
-                        onClick={() => { setViewState('dialpad'); setPhoneNumber(''); }}
-                        className="flex-1 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded shadow-sm transition-colors text-sm font-medium"
+                        onClick={() => { setViewState('dialpad'); setPhoneNumber(''); setSelectedItem(null); }}
+                        className={`flex-1 py-2 rounded shadow-sm transition-colors text-sm font-medium ${selectedItem ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-blue-500/50 text-white cursor-not-allowed'}`}
                     >
                         确认关联
                     </button>

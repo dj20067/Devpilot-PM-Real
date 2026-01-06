@@ -48,3 +48,5 @@ export interface OutboundContext {
   recordId: string;
   recordTitle?: string; // e.g., "会话 #123" or "工单：无法安装"
 }
+
+export type UserRole = 'official' | 'developer';

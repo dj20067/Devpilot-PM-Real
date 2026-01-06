@@ -5,7 +5,7 @@ import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
 import RightPanel from './components/RightPanel';
 import OutboundConsole from './components/OutboundConsole';
-import { User, ChatSession, Message, RightPanelTab, OutboundContext } from './types';
+import { User, ChatSession, Message, RightPanelTab, OutboundContext, UserRole } from './types';
 
 // Mock Data
 const currentUser: User = {
@@ -88,6 +88,9 @@ const App: React.FC = () => {
   const [activeRightTab, setActiveRightTab] = useState<RightPanelTab>(RightPanelTab.CUSTOMER_INFO);
   const [isOutboundOpen, setIsOutboundOpen] = useState<boolean>(false);
   const [outboundContext, setOutboundContext] = useState<OutboundContext | null>(null);
+  
+  // Role State
+  const [userRole, setUserRole] = useState<UserRole>('official');
 
   const handleOpenOutbound = () => {
     // Determine context based on the current view. 
@@ -119,7 +122,11 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full bg-background-light dark:bg-background-dark">
-      <Header onOpenOutbound={handleOpenOutbound} />
+      <Header 
+        onOpenOutbound={handleOpenOutbound} 
+        userRole={userRole}
+        onRoleChange={setUserRole}
+      />
       
       <div className="flex flex-1 overflow-hidden relative">
         <Sidebar />
