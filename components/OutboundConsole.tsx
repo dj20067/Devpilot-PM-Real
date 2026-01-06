@@ -395,12 +395,16 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                                             id: 't1',
                                                             type: 'ticket',
                                                             title: '椰子-工单 #T-20260101',
-                                                            subtitle: '无法安装Studio，报错代码503'
+                                                            subtitle: '无法安装Studio，报错代码503',
+                                                            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo'
                                                         })}
                                                         className="flex items-center gap-3 px-2 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded cursor-pointer group"
                                                     >
-                                                        <div className="w-8 h-8 rounded bg-orange-50 border border-orange-100 text-orange-500 flex items-center justify-center shrink-0">
-                                                            <span className="material-icons-outlined text-base">confirmation_number</span>
+                                                        <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden shrink-0 relative">
+                                                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo" className="w-full h-full object-cover"/>
+                                                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-orange-500 border-2 border-white dark:border-slate-800 rounded-full flex items-center justify-center">
+                                                                <span className="material-icons-outlined text-[8px] text-white">confirmation_number</span>
+                                                            </div>
                                                         </div>
                                                         <div className="min-w-0 flex-1">
                                                             <div className="text-sm font-medium text-slate-700 dark:text-slate-200 truncate">
@@ -436,9 +440,16 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                     已选择
                                 </div>
                                 <div className="p-3 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-3 relative overflow-hidden">
-                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${selectedItem.type === 'session' ? 'bg-slate-200' : 'bg-orange-100 text-orange-500'}`}>
-                                        {selectedItem.type === 'session' ? (
-                                             <img src={selectedItem.avatar} className="w-full h-full object-cover rounded-full"/>
+                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${!selectedItem.avatar ? 'bg-orange-100 text-orange-500' : 'bg-slate-200'}`}>
+                                        {selectedItem.avatar ? (
+                                             <div className="relative w-full h-full">
+                                                <img src={selectedItem.avatar} className="w-full h-full object-cover rounded-full"/>
+                                                 {selectedItem.type === 'ticket' && (
+                                                     <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-orange-500 border-2 border-white dark:border-surface-dark rounded-full flex items-center justify-center">
+                                                        <span className="material-icons-outlined text-[10px] text-white">confirmation_number</span>
+                                                     </div>
+                                                 )}
+                                             </div>
                                         ) : (
                                             <span className="material-icons-outlined">confirmation_number</span>
                                         )}
@@ -489,7 +500,8 @@ const OutboundConsole: React.FC<OutboundConsoleProps> = ({ isOpen, onClose, init
                                                 id: 't1',
                                                 type: 'ticket',
                                                 title: '椰子-工单 #T-20260101',
-                                                subtitle: '无法安装Studio，报错代码503'
+                                                subtitle: '无法安装Studio，报错代码503',
+                                                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKKDkrE61pLTwag1YvLy-AW_j4ndGmGCBdqik_D_weaHy3zv_71TsHKRCdBqzR8iejk05OlJenesFiFk5EHSqroIedkhLbU0g1UwQiZT-QCIa5PCTuc1IthvqLH1Si7l0Tc3xrSX5uyXIoFtaXoYOS7R0wL66gEYe5d_d6ThmG71fkme0VegMjQ1dRvdl5kTUNGGqyqPi6fnxLI5aAAKHak-MNVYLbRI5mHwZq699xhMu4SxaLNQyTQqtF3oYBP3chi4Y0LN5XzHo'
                                             })}
                                             className="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-900/30 text-slate-600 dark:text-slate-300 rounded border border-transparent hover:border-blue-200 transition-colors"
                                         >
