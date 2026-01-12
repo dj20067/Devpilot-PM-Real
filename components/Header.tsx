@@ -109,7 +109,9 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
         <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
           <span className="material-icons-outlined text-sm">support_agent</span>
         </div>
-        <h1 className="text-white font-medium text-sm tracking-wide">在线工程师系统</h1>
+        <h1 className="text-white font-medium text-sm tracking-wide">
+            {userRole === 'developer' ? '在线工程师.beta' : '在线工程师系统'}
+        </h1>
       </div>
       <div className="flex items-center gap-4">
         <button 
