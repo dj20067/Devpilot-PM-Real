@@ -7,8 +7,101 @@ interface HeaderProps {
   onRoleChange: (role: UserRole) => void;
 }
 
+type PilotTier = 'ace' | 'gold' | 'silver' | 'bronze' | 'trainee';
+
+interface TierConfig {
+  label: string;
+  icon: string;
+  rewardText: string;
+  styles: {
+    badgeBg: string;
+    badgeText: string;
+    badgeBorder: string;
+    tooltipHeaderBg: string;
+    tooltipText: string;
+    tooltipBorder: string;
+    iconColor: string;
+  };
+}
+
+const TIER_CONFIGS: Record<PilotTier, TierConfig> = {
+  ace: {
+    label: '王牌飞行员',
+    icon: 'workspace_premium',
+    rewardText: '此“飞行段位”额外奖励 75%',
+    styles: {
+      badgeBg: 'bg-gradient-to-r from-purple-500/10 to-indigo-500/10 hover:from-purple-500/20 hover:to-indigo-500/20',
+      badgeText: 'text-purple-600 dark:text-purple-400',
+      badgeBorder: 'border-purple-500/30',
+      tooltipHeaderBg: 'bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20',
+      tooltipText: 'text-purple-700 dark:text-purple-300',
+      tooltipBorder: 'border-purple-100 dark:border-purple-900/30',
+      iconColor: 'text-purple-500'
+    }
+  },
+  gold: {
+    label: '金牌飞行员',
+    icon: 'military_tech',
+    rewardText: '此“飞行段位”额外奖励 50%',
+    styles: {
+      badgeBg: 'bg-gradient-to-r from-amber-500/10 to-yellow-500/10 hover:from-amber-500/20 hover:to-yellow-500/20',
+      badgeText: 'text-amber-600 dark:text-amber-400',
+      badgeBorder: 'border-amber-500/40',
+      tooltipHeaderBg: 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20',
+      tooltipText: 'text-amber-700 dark:text-amber-400',
+      tooltipBorder: 'border-amber-100 dark:border-amber-900/30',
+      iconColor: 'text-amber-500'
+    }
+  },
+  silver: {
+    label: '银牌飞行员',
+    icon: 'military_tech',
+    rewardText: '此“飞行段位”额外奖励 40%',
+    styles: {
+      badgeBg: 'bg-gradient-to-r from-slate-200 to-gray-200 dark:from-slate-700 dark:to-gray-700 hover:opacity-90',
+      badgeText: 'text-slate-600 dark:text-slate-300',
+      badgeBorder: 'border-slate-300 dark:border-slate-500',
+      tooltipHeaderBg: 'bg-gradient-to-r from-slate-100 to-gray-100 dark:from-slate-800 dark:to-gray-800',
+      tooltipText: 'text-slate-700 dark:text-slate-300',
+      tooltipBorder: 'border-slate-200 dark:border-slate-600',
+      iconColor: 'text-slate-500 dark:text-slate-400'
+    }
+  },
+  bronze: {
+    label: '铜牌飞行员',
+    icon: 'military_tech',
+    rewardText: '此“飞行段位”额外奖励 20%',
+    styles: {
+      badgeBg: 'bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/20 dark:to-amber-900/20',
+      badgeText: 'text-orange-700 dark:text-orange-400',
+      badgeBorder: 'border-orange-300 dark:border-orange-700',
+      tooltipHeaderBg: 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/10 dark:to-amber-900/10',
+      tooltipText: 'text-orange-800 dark:text-orange-300',
+      tooltipBorder: 'border-orange-200 dark:border-orange-800',
+      iconColor: 'text-orange-600 dark:text-orange-500'
+    }
+  },
+  trainee: {
+    label: '见习飞行员',
+    icon: 'flight_takeoff',
+    rewardText: '见习期收益系数 0.5x',
+    styles: {
+      badgeBg: 'bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20',
+      badgeText: 'text-emerald-600 dark:text-emerald-400',
+      badgeBorder: 'border-emerald-200 dark:border-emerald-700',
+      tooltipHeaderBg: 'bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/10 dark:to-green-900/10',
+      tooltipText: 'text-emerald-700 dark:text-emerald-300',
+      tooltipBorder: 'border-emerald-100 dark:border-emerald-800',
+      iconColor: 'text-emerald-500'
+    }
+  }
+};
+
 const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentTier, setCurrentTier] = useState<PilotTier>('gold');
+
+  const tierConfig = TIER_CONFIGS[currentTier];
 
   return (
     <header className="h-12 bg-[#20293a] flex items-center justify-between px-4 shrink-0 shadow-md z-20">
@@ -60,24 +153,28 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                     </span>
                   ) : (
                     <div className="relative group" onClick={(e) => e.stopPropagation()}>
-                        <div className="scale-90 origin-left text-[9px] bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-1.5 rounded cursor-help flex items-center gap-0.5 hover:bg-amber-500/30 transition-colors">
-                            <span className="material-icons-outlined text-[10px]">military_tech</span>
-                            <span className="font-bold">金牌飞行员</span>
+                        <div className={`scale-90 origin-left text-[9px] border px-1.5 rounded cursor-help flex items-center gap-0.5 transition-colors ${tierConfig.styles.badgeBg} ${tierConfig.styles.badgeText} ${tierConfig.styles.badgeBorder}`}>
+                            <span className="material-icons-outlined text-[10px]">{tierConfig.icon}</span>
+                            <span className="font-bold">{tierConfig.label}</span>
                         </div>
 
                         {/* Tooltip */}
                         <div className="absolute top-full right-0 pt-3 w-80 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-[60] cursor-default">
                               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                                 {/* Header */}
-                                <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-3 border-b border-amber-100 dark:border-amber-900/30 flex justify-between items-center relative overflow-hidden">
+                                <div className={`p-3 border-b flex justify-between items-center relative overflow-hidden ${tierConfig.styles.tooltipHeaderBg} ${tierConfig.styles.tooltipBorder}`}>
                                     <div className="z-10 relative">
-                                        <div className="text-amber-600 dark:text-amber-400 font-bold text-xs flex items-center gap-1">
-                                            <span className="material-icons-outlined text-sm">flight_takeoff</span>
-                                            <span>金牌飞行员</span>
+                                        <div className={`font-bold text-xs flex items-center gap-1 ${tierConfig.styles.tooltipText}`}>
+                                            <span className="material-icons-outlined text-sm">{tierConfig.icon}</span>
+                                            <span>{tierConfig.label}</span>
                                         </div>
-                                        <div className="text-[10px] text-amber-600/90 mt-0.5 font-medium">此“飞行段位”格外奖励 30%</div>
+                                        <div className={`text-[10px] mt-0.5 font-medium opacity-90 ${tierConfig.styles.tooltipText}`}>
+                                            {tierConfig.rewardText}
+                                        </div>
                                     </div>
-                                    <span className="material-icons-outlined text-amber-400 text-5xl opacity-10 absolute -right-2 -bottom-4 rotate-12">military_tech</span>
+                                    <span className={`material-icons-outlined text-5xl opacity-10 absolute -right-2 -bottom-4 rotate-12 ${tierConfig.styles.iconColor}`}>
+                                        {tierConfig.icon}
+                                    </span>
                                 </div>
                                 
                                 {/* Content */}
@@ -149,7 +246,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                                             说明
                                         </div>
                                         <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
-                                            等级体系：见习 / 铜牌 / 银牌 / 金牌 / 铂金。<br/>当前等级由运营团队综合评估。
+                                            等级体系：见习 / 铜牌 / 银牌 / 金牌 / 王牌。<br/>当前等级由运营团队综合评估。
                                         </p>
                                     </div>
                                 </div>
@@ -166,7 +263,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
           {isMenuOpen && (
             <>
                 <div className="fixed inset-0 z-10" onClick={() => setIsMenuOpen(false)}></div>
-                <div className="absolute right-0 top-full mt-2 w-40 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-20 py-1 animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-20 py-1 animate-in fade-in zoom-in-95 duration-100">
                     <div className="px-3 py-2 border-b border-slate-100 dark:border-slate-700 text-[10px] text-slate-400 font-medium">切换角色</div>
                     <button 
                         onClick={() => { onRoleChange('official'); setIsMenuOpen(false); }}
@@ -182,6 +279,26 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                         <span>社区飞行员</span>
                         {userRole === 'developer' && <span className="material-icons-outlined text-sm">check</span>}
                     </button>
+
+                    {/* Tier Switcher for Demo */}
+                    {userRole === 'developer' && (
+                        <>
+                           <div className="px-3 py-1.5 border-b border-t border-slate-100 dark:border-slate-700 text-[10px] text-slate-400 font-medium bg-slate-50 dark:bg-slate-800/50 mt-1">切换段位 (演示)</div>
+                           <div className="grid grid-cols-1">
+                                {(['ace', 'gold', 'silver', 'bronze', 'trainee'] as PilotTier[]).map(tier => (
+                                    <button
+                                        key={tier}
+                                        onClick={(e) => { e.stopPropagation(); setCurrentTier(tier); }}
+                                        className={`px-4 py-2 text-xs text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between ${currentTier === tier ? 'text-blue-600 font-medium bg-blue-50/50' : 'text-slate-600'}`}
+                                    >
+                                        <span>{TIER_CONFIGS[tier].label}</span>
+                                        {currentTier === tier && <span className="material-icons-outlined text-xs">radio_button_checked</span>}
+                                    </button>
+                                ))}
+                           </div>
+                        </>
+                    )}
+
                     <div className="border-t border-slate-100 dark:border-slate-700 mt-1"></div>
                     <button className="w-full text-left px-4 py-2 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2">
                         <span className="material-icons-outlined text-sm">logout</span>

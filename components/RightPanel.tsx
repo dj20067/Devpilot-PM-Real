@@ -1,25 +1,31 @@
 import React from 'react';
-import { User, RightPanelTab } from '../types';
+import { User, RightPanelTab, UserRole } from '../types';
 
 interface RightPanelProps {
   user: User;
   activeTab: RightPanelTab;
   onTabChange: (tab: RightPanelTab) => void;
+  userRole: UserRole;
 }
 
-const RightPanel: React.FC<RightPanelProps> = ({ user, activeTab, onTabChange }) => {
-  const tabs = [
+const RightPanel: React.FC<RightPanelProps> = ({ user, activeTab, onTabChange, userRole }) => {
+  const allTabs = [
     { id: RightPanelTab.ACTIONS, label: '会话操作' },
     { id: RightPanelTab.CUSTOMER_INFO, label: '客户信息' },
     { id: RightPanelTab.HISTORY, label: '服务历史' },
     { id: RightPanelTab.MORE_INFO, label: '更多信息' },
   ];
 
+  // Restrict tabs for developers
+  const visibleTabs = userRole === 'developer' 
+    ? allTabs.filter(t => [RightPanelTab.ACTIONS, RightPanelTab.HISTORY].includes(t.id))
+    : allTabs;
+
   return (
     <aside className="w-80 bg-surface-light dark:bg-surface-dark border-l border-border-light dark:border-border-dark flex flex-col shrink-0 overflow-y-auto">
       {/* Tab Header */}
       <div className="flex items-center justify-between px-2 h-12 border-b border-border-light dark:border-border-dark">
-        {tabs.map((tab) => (
+        {visibleTabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
@@ -39,10 +45,10 @@ const RightPanel: React.FC<RightPanelProps> = ({ user, activeTab, onTabChange })
 
       {/* Content Area */}
       <div className="flex-1 custom-scrollbar">
-        {activeTab === RightPanelTab.CUSTOMER_INFO && <CustomerInfoContent user={user} />}
+        {activeTab === RightPanelTab.CUSTOMER_INFO && userRole === 'official' && <CustomerInfoContent user={user} />}
         {activeTab === RightPanelTab.ACTIONS && <ActionsContent />}
-        {activeTab === RightPanelTab.HISTORY && <HistoryContent />}
-        {activeTab === RightPanelTab.MORE_INFO && <MoreInfoContent />}
+        {activeTab === RightPanelTab.HISTORY && <HistoryContent userRole={userRole} />}
+        {activeTab === RightPanelTab.MORE_INFO && userRole === 'official' && <MoreInfoContent />}
       </div>
     </aside>
   );
@@ -169,41 +175,54 @@ const ActionsContent: React.FC = () => (
   </div>
 );
 
-const HistoryContent: React.FC = () => (
-  <div className="p-4 space-y-4">
-    <div className="relative inline-block text-left w-32">
-        <button className="inline-flex justify-between w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-3 py-2 bg-white dark:bg-surface-dark text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50">
-            全部
-            <span className="material-icons-outlined text-gray-400 text-lg">expand_more</span>
-        </button>
+const HistoryContent: React.FC<{ userRole: UserRole }> = ({ userRole }) => {
+  const allHistory = [
+    { status: 'unresolved', type: 'session', date: '2026/01/04 10:43', duration: '7分45秒', agent: '子鱼' },
+    { status: 'resolved', type: 'session', date: '2026/01/04 10:35', duration: '7分23秒', agent: '子鱼' },
+    { status: 'resolved', type: 'session', date: '2025/12/31 16:13', duration: '7分9秒', agent: '子鱼' },
+    { status: 'resolved', type: 'session', date: '2025/12/28 14:20', duration: '5分12秒', agent: '官方客服' },
+  ];
+
+  const displayedHistory = userRole === 'developer'
+    ? allHistory.filter(item => item.agent === '子鱼') // Mocking current user match
+    : allHistory;
+
+  return (
+    <div className="p-4 space-y-4">
+      <div className="relative inline-block text-left w-32">
+          <button className="inline-flex justify-between w-full rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-3 py-2 bg-white dark:bg-surface-dark text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50">
+              全部
+              <span className="material-icons-outlined text-gray-400 text-lg">expand_more</span>
+          </button>
+      </div>
+      {/* List Items */}
+      {displayedHistory.length === 0 ? (
+          <div className="text-center text-slate-400 py-8 text-xs">暂无相关记录</div>
+      ) : (
+        displayedHistory.map((item, i) => (
+          <div key={i} className="bg-white dark:bg-slate-800 rounded-lg p-4 flex items-start gap-3 border border-border-light dark:border-border-dark shadow-sm">
+              <div className="mt-1"><span className="material-icons-outlined text-green-500 text-lg">chat_bubble_outline</span></div>
+              <div className="flex-1">
+                  <div className="flex justify-between items-start mb-1">
+                      <div className="flex gap-2 items-center">
+                          <span className={`px-2 py-0.5 text-xs rounded border ${item.status === 'resolved' ? 'border-tag-resolved-border text-tag-resolved-text bg-tag-resolved-bg' : 'border-tag-unresolved-border text-tag-unresolved-text bg-tag-unresolved-bg'}`}>
+                              {item.status === 'resolved' ? '已解决' : '未解决'}
+                          </span>
+                          <span className="px-2 py-0.5 text-xs rounded border border-tag-session-border text-tag-session-text bg-tag-session-bg">会话</span>
+                      </div>
+                      <div className="text-xs text-slate-500 text-right">{item.date}</div>
+                  </div>
+                  <div className="flex justify-between items-end">
+                      <div className="text-slate-800 dark:text-slate-200 font-medium">{item.agent}</div>
+                      <div className="text-xs text-slate-500">时长：{item.duration}</div>
+                  </div>
+              </div>
+          </div>
+        ))
+      )}
     </div>
-    {/* List Items */}
-    {[
-        { status: 'unresolved', type: 'session', date: '2026/01/04 10:43', duration: '7分45秒', agent: '子鱼' },
-        { status: 'resolved', type: 'session', date: '2026/01/04 10:35', duration: '7分23秒', agent: '子鱼' },
-        { status: 'resolved', type: 'session', date: '2025/12/31 16:13', duration: '7分9秒', agent: '子鱼' },
-    ].map((item, i) => (
-        <div key={i} className="bg-white dark:bg-slate-800 rounded-lg p-4 flex items-start gap-3 border border-border-light dark:border-border-dark shadow-sm">
-             <div className="mt-1"><span className="material-icons-outlined text-green-500 text-lg">chat_bubble_outline</span></div>
-             <div className="flex-1">
-                 <div className="flex justify-between items-start mb-1">
-                     <div className="flex gap-2 items-center">
-                         <span className={`px-2 py-0.5 text-xs rounded border ${item.status === 'resolved' ? 'border-tag-resolved-border text-tag-resolved-text bg-tag-resolved-bg' : 'border-tag-unresolved-border text-tag-unresolved-text bg-tag-unresolved-bg'}`}>
-                             {item.status === 'resolved' ? '已解决' : '未解决'}
-                         </span>
-                         <span className="px-2 py-0.5 text-xs rounded border border-tag-session-border text-tag-session-text bg-tag-session-bg">会话</span>
-                     </div>
-                     <div className="text-xs text-slate-500 text-right">{item.date}</div>
-                 </div>
-                 <div className="flex justify-between items-end">
-                     <div className="text-slate-800 dark:text-slate-200 font-medium">{item.agent}</div>
-                     <div className="text-xs text-slate-500">时长：{item.duration}</div>
-                 </div>
-             </div>
-        </div>
-    ))}
-  </div>
-);
+  );
+};
 
 const MoreInfoContent: React.FC = () => (
     <div className="p-6 space-y-4">

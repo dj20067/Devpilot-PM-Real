@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import ChatList from './components/ChatList';
@@ -142,6 +142,16 @@ const App: React.FC = () => {
   // Derived current session and user
   const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
   const displayUser = activeSession.user;
+
+  // Auto-switch tab if role changes to developer and current tab is restricted
+  useEffect(() => {
+    if (userRole === 'developer') {
+        const allowedTabs = [RightPanelTab.ACTIONS, RightPanelTab.HISTORY];
+        if (!allowedTabs.includes(activeRightTab)) {
+            setActiveRightTab(RightPanelTab.ACTIONS);
+        }
+    }
+  }, [userRole, activeRightTab]);
 
   const handleOpenOutbound = () => {
     if (activeSession) {
@@ -287,6 +297,7 @@ const App: React.FC = () => {
           user={displayUser} 
           activeTab={activeRightTab} 
           onTabChange={setActiveRightTab} 
+          userRole={userRole}
         />
 
         {/* Floating Components */}
