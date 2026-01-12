@@ -298,6 +298,7 @@ const App: React.FC = () => {
           activeTab={activeRightTab} 
           onTabChange={setActiveRightTab} 
           userRole={userRole}
+          onOpenOutbound={handleOpenOutbound}
         />
 
         {/* Floating Components */}
