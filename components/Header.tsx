@@ -8,6 +8,7 @@ interface HeaderProps {
 }
 
 type PilotTier = 'ace' | 'gold' | 'silver' | 'bronze' | 'trainee';
+type UserStatus = 'online' | 'away' | 'offline';
 
 interface TierConfig {
   label: string;
@@ -100,8 +101,21 @@ const TIER_CONFIGS: Record<PilotTier, TierConfig> = {
 const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentTier, setCurrentTier] = useState<PilotTier>('gold');
+  
+  // Status State
+  const [userStatus, setUserStatus] = useState<UserStatus>('online');
+  const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(false);
+  const [acceptTickets, setAcceptTickets] = useState(true);
 
   const tierConfig = TIER_CONFIGS[currentTier];
+
+  const statusOptions = [
+    { key: 'online', label: '在线', icon: 'check_circle', color: 'text-green-500', sub: '接收会话与工单' },
+    { key: 'away', label: '挂机', icon: 'bedtime', color: 'text-amber-500', sub: '暂不分配新会话' },
+    { key: 'offline', label: '离线', icon: 'highlight_off', color: 'text-slate-400', sub: '停止所有服务' },
+  ] as const;
+
+  const currentStatusConfig = statusOptions.find(s => s.key === userStatus) || statusOptions[0];
 
   return (
     <header className="h-12 bg-[#20293a] flex items-center justify-between px-4 shrink-0 shadow-md z-20">
@@ -120,11 +134,73 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
         >
           外呼发起(空闲:28)
         </button>
-        <div className="flex items-center text-gray-300 gap-1 cursor-pointer hover:text-white">
-          <span className="material-icons-outlined text-base">highlight_off</span>
-          <span className="text-xs">离线</span>
-          <span className="material-icons-outlined text-xs">arrow_drop_down</span>
+
+        {/* Status Switcher */}
+        <div className="relative">
+            <button
+                onClick={() => setIsStatusMenuOpen(!isStatusMenuOpen)}
+                className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-white/10 transition-colors focus:outline-none group"
+            >
+                <span className={`material-icons-outlined text-base ${currentStatusConfig.color}`}>
+                    {currentStatusConfig.icon}
+                </span>
+                <span className={`text-xs font-medium ${userStatus === 'offline' ? 'text-gray-400' : 'text-gray-200 group-hover:text-white'}`}>
+                    {currentStatusConfig.label}
+                </span>
+                <span className="material-icons-outlined text-xs text-gray-400">arrow_drop_down</span>
+            </button>
+
+            {isStatusMenuOpen && (
+                <>
+                    <div className="fixed inset-0 z-30" onClick={() => setIsStatusMenuOpen(false)} />
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-72 bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden z-40 animate-in fade-in zoom-in-95 duration-100">
+                         <div className="p-2 space-y-1">
+                            {statusOptions.map(option => (
+                                <button
+                                    key={option.key}
+                                    onClick={() => { setUserStatus(option.key as any); setIsStatusMenuOpen(false); }}
+                                    className={`w-full flex items-start gap-3 px-3 py-3 rounded-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-left group ${userStatus === option.key ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                                >
+                                    <span className={`material-icons-outlined text-xl mt-0.5 ${option.color}`}>{option.icon}</span>
+                                    <div>
+                                        <div className={`text-sm font-medium ${userStatus === option.key ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200 group-hover:text-slate-900'}`}>
+                                            {option.label}
+                                        </div>
+                                        <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{option.sub}</div>
+                                    </div>
+                                    {userStatus === option.key && <span className="material-icons-outlined text-blue-600 text-base ml-auto mt-1">check</span>}
+                                </button>
+                            ))}
+                         </div>
+                         
+                         <div className="border-t border-slate-100 dark:border-slate-700 p-4 bg-slate-50 dark:bg-slate-800/50">
+                            <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                    <div className="flex items-center gap-1.5">
+                                        <span className={`text-sm font-bold ${userStatus === 'online' ? 'text-slate-700 dark:text-slate-200' : 'text-slate-400'}`}>工单接单模式</span>
+                                        {userStatus === 'online' && acceptTickets && <span className="text-[10px] bg-green-100 text-green-600 px-1.5 rounded-full border border-green-200">听单中</span>}
+                                    </div>
+                                    <span className="text-xs text-slate-400 mt-0.5">类似滴滴模式，自动接收派单</span>
+                                </div>
+                                <button 
+                                    onClick={() => userStatus === 'online' && setAcceptTickets(!acceptTickets)}
+                                    className={`w-11 h-6 rounded-full relative transition-colors duration-200 focus:outline-none ${acceptTickets && userStatus === 'online' ? 'bg-green-500' : 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed opacity-70'}`}
+                                >
+                                    <div className={`w-4 h-4 bg-white rounded-full shadow-sm absolute top-1 transition-transform duration-200 ${acceptTickets && userStatus === 'online' ? 'left-[22px]' : 'left-1'}`}></div>
+                                </button>
+                            </div>
+                            {userStatus !== 'online' && (
+                                <div className="text-xs text-amber-600 mt-2 flex items-center gap-1.5 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded border border-amber-100 dark:border-amber-900/30">
+                                    <span className="material-icons-outlined text-sm">warning_amber</span>
+                                    需切换至「在线」状态才可接单
+                                </div>
+                            )}
+                         </div>
+                    </div>
+                </>
+            )}
         </div>
+
         <div className="text-gray-300 hover:text-white cursor-pointer relative">
           <span className="material-icons-outlined text-lg">volume_up</span>
         </div>
