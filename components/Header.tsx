@@ -54,19 +54,19 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
             <div className="flex flex-col items-start leading-none -space-y-0.5">
                 <span className="text-xs">子鱼</span>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <span className="text-[9px] opacity-70 scale-90 origin-left border border-gray-500 px-1 rounded">
-                      {userRole === 'official' ? '官方工程师' : '社区飞行员'}
-                  </span>
-                  
-                  {userRole === 'developer' && (
+                  {userRole === 'official' ? (
+                    <span className="text-[9px] opacity-70 scale-90 origin-left border border-gray-500 px-1 rounded">
+                        官方工程师
+                    </span>
+                  ) : (
                     <div className="relative group" onClick={(e) => e.stopPropagation()}>
                         <div className="scale-90 origin-left text-[9px] bg-gradient-to-r from-amber-500/20 to-yellow-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/40 px-1.5 rounded cursor-help flex items-center gap-0.5 hover:bg-amber-500/30 transition-colors">
                             <span className="material-icons-outlined text-[10px]">military_tech</span>
-                            <span className="font-bold">金牌</span>
+                            <span className="font-bold">金牌飞行员</span>
                         </div>
 
                         {/* Tooltip */}
-                        <div className="absolute top-full right-0 pt-3 w-64 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-[60] cursor-default">
+                        <div className="absolute top-full right-0 pt-3 w-80 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-[60] cursor-default">
                               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                                 {/* Header */}
                                 <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-3 border-b border-amber-100 dark:border-amber-900/30 flex justify-between items-center relative overflow-hidden">
@@ -75,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                                             <span className="material-icons-outlined text-sm">flight_takeoff</span>
                                             <span>金牌飞行员</span>
                                         </div>
-                                        <div className="text-[10px] text-amber-500/80 mt-0.5">当前收益系数: <span className="font-bold">1.5x</span></div>
+                                        <div className="text-[10px] text-amber-600/90 mt-0.5 font-medium">此“飞行段位”格外奖励 30%</div>
                                     </div>
                                     <span className="material-icons-outlined text-amber-400 text-5xl opacity-10 absolute -right-2 -bottom-4 rotate-12">military_tech</span>
                                 </div>
@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="bg-slate-50 dark:bg-slate-700/50 p-2 rounded border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center gap-1">
                                                 <span className="material-icons-outlined text-sm text-indigo-400">confirmation_number</span>
-                                                <span className="text-[10px] text-slate-600 dark:text-slate-300">工单与会话量</span>
+                                                <span className="text-[10px] text-slate-600 dark:text-slate-300">互助会话量</span>
                                             </div>
                                             <div className="bg-slate-50 dark:bg-slate-700/50 p-2 rounded border border-slate-100 dark:border-slate-700 flex flex-col items-center text-center gap-1">
                                                 <span className="material-icons-outlined text-sm text-blue-400">timer</span>
@@ -106,6 +106,41 @@ const Header: React.FC<HeaderProps> = ({ onOpenOutbound, userRole, onRoleChange 
                                                 <span className="text-[10px] text-slate-600 dark:text-slate-300">在线活跃时长</span>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {/* Special Reminder */}
+                                    <div className="bg-[#fffbe6] dark:bg-yellow-900/10 rounded p-2.5 border border-yellow-100 dark:border-yellow-900/20">
+                                            <div className="flex justify-between items-center mb-1.5">
+                                                <div className="flex items-center gap-1">
+                                                    <span className="material-icons-outlined text-amber-500 text-xs">warning</span>
+                                                    <span className="font-bold text-[10px] text-amber-800 dark:text-amber-500">特别提醒</span>
+                                                </div>
+                                                <button className="text-blue-500 hover:text-blue-600 text-[10px] flex items-center gap-0.5 cursor-pointer">
+                                                    标准 <span className="material-icons-outlined text-[10px]">open_in_new</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <p className="text-[10px] text-amber-800/70 dark:text-amber-500/70 mb-2 font-medium">
+                                            服务时长与质量绑定「飞行段位」
+                                            </p>
+                                            
+                                            <div className="space-y-2">
+                                                <div className="flex items-start gap-1.5">
+                                                    <span className="material-icons-outlined text-red-400 text-xs mt-0.5">trending_up</span>
+                                                    <div className="text-[10px] text-slate-600 dark:text-slate-300 leading-snug">
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">顶格输出：</span>
+                                                        高激励系数、优质工单优先抢、资源倾斜
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-start gap-1.5">
+                                                        <span className="material-icons-outlined text-blue-400 text-xs mt-0.5">trending_down</span>
+                                                        <div className="text-[10px] text-slate-600 dark:text-slate-300 leading-snug">
+                                                        <span className="font-bold text-slate-800 dark:text-slate-200">摆烂划水：</span>
+                                                        段位俯冲降级，严重者当场吊销执照
+                                                    </div>
+                                                </div>
+                                            </div>
                                     </div>
 
                                     <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
