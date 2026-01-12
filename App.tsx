@@ -130,12 +130,12 @@ const App: React.FC = () => {
   const [sessions, setSessions] = useState<ChatSession[]>(initialSessions);
   const [activeSessionId, setActiveSessionId] = useState<string>('s1');
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [activeRightTab, setActiveRightTab] = useState<RightPanelTab>(RightPanelTab.CUSTOMER_INFO);
+  const [activeRightTab, setActiveRightTab] = useState<RightPanelTab>(RightPanelTab.ACTIONS);
   const [isOutboundOpen, setIsOutboundOpen] = useState<boolean>(false);
   const [outboundContext, setOutboundContext] = useState<OutboundContext | null>(null);
   
   // Role & Service Modal State
-  const [userRole, setUserRole] = useState<UserRole>('official');
+  const [userRole, setUserRole] = useState<UserRole>('developer');
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
 
@@ -274,7 +274,7 @@ const App: React.FC = () => {
       />
       
       <div className="flex flex-1 overflow-hidden relative">
-        <Sidebar />
+        <Sidebar userRole={userRole} />
         <ChatList 
           sessions={sessions} 
           activeSessionId={activeSessionId} 

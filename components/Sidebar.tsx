@@ -1,6 +1,11 @@
 import React from 'react';
+import { UserRole } from '../types';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  userRole?: UserRole;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ userRole = 'official' }) => {
   const menuItems = [
     { icon: 'home', label: '首页', active: false },
     { icon: 'support_agent', label: '实时会话', active: true },
@@ -19,10 +24,19 @@ const Sidebar: React.FC = () => {
     { icon: 'person', label: '个人中心', noArrow: true },
   ];
 
+  // Filter for developer (pilot) role
+  const visibleMenuItems = userRole === 'developer'
+    ? menuItems.filter(item => ['首页', '实时会话', '会话记录', '工单列表'].includes(item.label))
+    : menuItems;
+
+  const visibleBottomItems = userRole === 'developer'
+    ? bottomItems.filter(item => ['个人中心'].includes(item.label))
+    : bottomItems;
+
   return (
     <nav className="w-56 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col shrink-0 overflow-y-auto">
       <div className="py-2">
-        {menuItems.map((item, index) => (
+        {visibleMenuItems.map((item, index) => (
           <a 
             key={index}
             href="#"
@@ -38,7 +52,7 @@ const Sidebar: React.FC = () => {
         ))}
 
         <div className="mt-2">
-          {bottomItems.map((item, index) => (
+          {visibleBottomItems.map((item, index) => (
             <div 
               key={index}
               className="flex items-center justify-between px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
